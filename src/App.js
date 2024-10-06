@@ -33,6 +33,7 @@ function App() {
         </nav>
         <div className="container mx-auto p-4">
           <Routes>
+            <Route path='/numberSearch' element={<CSVNumbers />} />
             <Route path="/" element={<NumberGenerator />} />
             <Route path="/csv" element={<CSVNumbers />} />
           </Routes>
