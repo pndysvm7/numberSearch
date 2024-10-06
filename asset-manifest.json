@@ -1,16 +1,15 @@
 {
   "files": {
-    "main.css": "/numberSearch/static/css/main.b395f488.css",
-    "main.js": "/numberSearch/static/js/main.fa4291c0.js",
+    "main.css": "/numberSearch/static/css/main.78511521.css",
+    "main.js": "/numberSearch/static/js/main.9e03097c.js",
     "static/js/453.a7d2fa25.chunk.js": "/numberSearch/static/js/453.a7d2fa25.chunk.js",
-    "static/media/logo.svg": "/numberSearch/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/numberSearch/index.html",
-    "main.b395f488.css.map": "/numberSearch/static/css/main.b395f488.css.map",
-    "main.fa4291c0.js.map": "/numberSearch/static/js/main.fa4291c0.js.map",
+    "main.78511521.css.map": "/numberSearch/static/css/main.78511521.css.map",
+    "main.9e03097c.js.map": "/numberSearch/static/js/main.9e03097c.js.map",
     "453.a7d2fa25.chunk.js.map": "/numberSearch/static/js/453.a7d2fa25.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b395f488.css",
-    "static/js/main.fa4291c0.js"
+    "static/css/main.78511521.css",
+    "static/js/main.9e03097c.js"
   ]
 }
