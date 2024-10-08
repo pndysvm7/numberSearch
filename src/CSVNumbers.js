@@ -44,10 +44,8 @@ const CSVNumbers = () => {
       const numberPart = numberParts[i];
       
       if (/^\d{2}$/.test(patternPart)) {
-        // If the pattern part is two digits, it must match exactly
         if (patternPart !== numberPart) return false;
       } else {
-        // If the pattern part is two letters, it represents a pair of digits
         if (patternMap.has(patternPart)) {
           if (patternMap.get(patternPart) !== numberPart) return false;
         } else {
@@ -85,11 +83,12 @@ const CSVNumbers = () => {
         let csvContent = forDownload ? 'Number,Single Digit Sum,Two Digit Sum\n' : '';
 
         results.data.forEach((row) => {
-          const numberStr = row[0].toString().padStart(10, '0');
+          if (!row[0]) return; // Skip empty rows
+
+          // Use the original number from the CSV without padding
+          const numberStr = row[0].toString().trim();
           
-          if (numberStr.length !== 10) {
-            return; // Skip invalid numbers
-          }
+          if (numberStr.length > 10) return; // Skip numbers longer than 10 digits
 
           if (
             (!start || numberStr.startsWith(start)) &&
