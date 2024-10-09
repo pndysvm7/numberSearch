@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import './App.css';
 import NumberGenerator from './NumberGenerator';
 import CSVNumbers from './CSVNumbers';
+import NumberSearchForm from './numberSearchForm';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,6 +17,7 @@ function App() {
             <div className="hidden md:flex space-x-4 flex-grow">
               <NavLink to="/">Number Generator</NavLink>
               <NavLink to="/csv">CSV Numbers</NavLink>
+              <NavLink to='/searchmyvi'> MYVI Search </NavLink>
             </div>
             <button
               className="md:hidden ml-auto text-white hover:bg-blue-700 px-3 py-2 rounded-md transition duration-300 ease-in-out"
@@ -28,6 +30,7 @@ function App() {
             <div className="md:hidden mt-2">
               <NavLink to="/" onClick={() => setIsMenuOpen(false)}>Number Generator</NavLink>
               <NavLink to="/csv" onClick={() => setIsMenuOpen(false)}>CSV Numbers</NavLink>
+              <NavLink to="/searchmyvi" onClick={() => setIsMenuOpen(false)}>CSV Numbers</NavLink>
             </div>
           )}
         </nav>
@@ -36,6 +39,7 @@ function App() {
             <Route path='/numberSearch' element={<CSVNumbers />} />
             <Route path="/" element={<NumberGenerator />} />
             <Route path="/csv" element={<CSVNumbers />} />
+            <Route path="/searchmyvi" element={<NumberSearchForm />} />
           </Routes>
         </div>
       </div>
