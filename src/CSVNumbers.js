@@ -73,16 +73,11 @@ const CSVNumbers = () => {
     return numberStr.split('').reduce((acc, digit) => acc + parseInt(digit), 0);
   }, []);
 
-  const matchesPattern = useCallback((numberStr, patternStr) => {
-    if (!patternStr) return true;
-    if (patternStr.length < 10) return false;
-    if (numberStr.length !== patternStr.length) return false;
-
+  const matches = useCallback((numberStr, pattern) => {
+    if (!pattern || !pattern?.length) return true;
     let patternObj = {};
     let temp_index = 0;
 
-    // iF YOU SEARCHED ABAB in 10 DIGIT PATTERN
-    // THEN patternObj will be { A: [ 0, 2 ], B: [ 1, 3 ] }
     for (let items of pattern) {
         if (!patternObj[items]) {
             patternObj[items] = [];
@@ -90,8 +85,24 @@ const CSVNumbers = () => {
         patternObj[items].push(temp_index);
         temp_index += 1;
     }
-    const patternLength = patternStr.length;
-    return isPatternValid(numberStr, patternObj, patternLength);
+
+    let numObject = {};
+    temp_index = 0;
+    for (let items of numberStr) {
+        if (!numObject[items]) {
+          numObject[items] = [];
+        }
+        numObject[items].push(temp_index);
+        temp_index += 1;
+    }
+
+    let pattern2DArray = Object.values(patternObj);
+    pattern2DArray.sort();
+
+    let nums2DArray = Object.values(numObject);
+    nums2DArray.sort();
+
+    return JSON.stringify(pattern2DArray) === JSON.stringify(nums2DArray);
   }, []);
 
   const downloadCSV = useCallback((csvContent) => {
@@ -123,7 +134,7 @@ const CSVNumbers = () => {
             (!numbersNotNeeded || !containsDigits(numberStr, numbersNotNeeded)) &&
             (!singleDigitSum || digitRoot(numberStr) === parseInt(singleDigitSum)) &&
             (!twoDigitSum || doubleDigitSumFunction(numberStr) === parseInt(twoDigitSum)) &&
-            matchesPattern(numberStr, pattern)
+            (!pattern || matches(numberStr, pattern))
           ) {
             if (forDownload) {
               csvContent.push(`${numberStr},${digitRoot(numberStr)},${doubleDigitSumFunction(numberStr)}`);
