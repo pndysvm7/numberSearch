@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/numberSearch/static/css/main.94007a66.css",
-    "main.js": "/numberSearch/static/js/main.33413503.js",
+    "main.js": "/numberSearch/static/js/main.1bce0d0d.js",
     "static/js/453.a7d2fa25.chunk.js": "/numberSearch/static/js/453.a7d2fa25.chunk.js",
     "index.html": "/numberSearch/index.html",
     "main.94007a66.css.map": "/numberSearch/static/css/main.94007a66.css.map",
-    "main.33413503.js.map": "/numberSearch/static/js/main.33413503.js.map",
+    "main.1bce0d0d.js.map": "/numberSearch/static/js/main.1bce0d0d.js.map",
     "453.a7d2fa25.chunk.js.map": "/numberSearch/static/js/453.a7d2fa25.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.94007a66.css",
-    "static/js/main.33413503.js"
+    "static/js/main.1bce0d0d.js"
   ]
 }
