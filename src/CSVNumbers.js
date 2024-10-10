@@ -3,6 +3,43 @@ import Papa from 'papaparse';
 
 const CHUNK_SIZE = 1000; // Process 1000 rows at a time
 
+const allEqual = async (arr) => arr.every(v => v === arr[0])
+
+const isPatternValid = (strNumber, patternObj, patternLength) => {
+  let subStr = "";
+  const prr = []
+  for (let digit of strNumber) {
+      let flag = true;
+      if (subStr.length === patternLength) {
+          let newSubStr = subStr.slice(1);
+          subStr = newSubStr;
+      }
+      subStr += digit;
+      if (subStr.length < patternLength) {
+          continue;
+      }
+      // dumb.push(subStr);
+      for  (let key of Object.keys(patternObj)) {
+          let temp = [];
+          for  (let g of patternObj[key]) {
+                temp.push(subStr[g]);
+          }
+          if (key === '0' || key === '1' || key === '2' || key === '3' || key === '4' || key === '5' || key === '6' || key === '7' || key === '8' || key === '9') {
+                temp.push(key);
+          }
+          if (allEqual(temp) === false) {
+              flag = false;
+              break;
+          } 
+      }
+      if (flag === true) {
+            prr.push(strNumber);
+      }
+  }
+
+  return prr.length > 0;
+}
+
 const CSVNumbers = () => {
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
@@ -38,28 +75,23 @@ const CSVNumbers = () => {
 
   const matchesPattern = useCallback((numberStr, patternStr) => {
     if (!patternStr) return true;
+    if (patternStr.length < 10) return false;
     if (numberStr.length !== patternStr.length) return false;
-    
-    const patternParts = patternStr.match(/.{1,2}/g) || [];
-    const numberParts = numberStr.match(/.{1,2}/g) || [];
-    const patternMap = new Map();
-    
-    for (let i = 0; i < patternParts.length; i++) {
-      const patternPart = patternParts[i];
-      const numberPart = numberParts[i];
-      
-      if (/^\d{2}$/.test(patternPart)) {
-        if (patternPart !== numberPart) return false;
-      } else {
-        if (patternMap.has(patternPart)) {
-          if (patternMap.get(patternPart) !== numberPart) return false;
-        } else {
-          patternMap.set(patternPart, numberPart);
+
+    let patternObj = {};
+    let temp_index = 0;
+
+    // iF YOU SEARCHED ABAB in 10 DIGIT PATTERN
+    // THEN patternObj will be { A: [ 0, 2 ], B: [ 1, 3 ] }
+    for (let items of pattern) {
+        if (!patternObj[items]) {
+            patternObj[items] = [];
         }
-      }
+        patternObj[items].push(temp_index);
+        temp_index += 1;
     }
-    
-    return true;
+    const patternLength = patternStr.length;
+    return isPatternValid(numberStr, patternObj, patternLength);
   }, []);
 
   const downloadCSV = useCallback((csvContent) => {
