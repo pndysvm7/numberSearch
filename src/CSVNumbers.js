@@ -150,7 +150,7 @@ const CSVNumbers = () => {
       });
     });
     return { validNumbers, csvContent };
-  }, [start, end, numbersNotNeeded, singleDigitSum, twoDigitSum, pattern, containsDigits, digitRoot, doubleDigitSumFunction, matchesPattern]);
+  }, [start, end, numbersNotNeeded, singleDigitSum, twoDigitSum, pattern, containsDigits, digitRoot, doubleDigitSumFunction, matches]);
 
   const processCSV = useCallback((file, forDownload = false) => {
     setError('');
