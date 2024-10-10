@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 
 const NumberGenerator = () => {
   const [start, setStart] = useState('');
@@ -6,9 +6,12 @@ const NumberGenerator = () => {
   const [numbersNotNeeded, setNumbersNotNeeded] = useState('');
   const [singleDigitSum, setSingleDigitSum] = useState('');
   const [twoDigitSum, setTwoDigitSum] = useState('');
+  const [tenDigitPattern, setTenDigitPattern] = useState('');
   const [generatedNumbers, setGeneratedNumbers] = useState([]);
   const [error, setError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const cancelRef = useRef(false);
 
   const containsDigits = useCallback((numberStr, digitsPattern) => {
     const regex = new RegExp(`[${digitsPattern}]`);
@@ -27,26 +30,58 @@ const NumberGenerator = () => {
     return numberStr.split('').reduce((acc, digit) => acc + parseInt(digit), 0);
   }, []);
 
+  const matches = useCallback((numberStr, pattern) => {
+    if (!pattern || !pattern?.length) return true;
+    let patternObj = {};
+    let temp_index = 0;
+
+    for (let items of pattern) {
+        if (!patternObj[items]) {
+            patternObj[items] = [];
+        }
+        patternObj[items].push(temp_index);
+        temp_index += 1;
+    }
+
+    let numObject = {};
+    temp_index = 0;
+    for (let items of numberStr) {
+        if (!numObject[items]) {
+          numObject[items] = [];
+        }
+        numObject[items].push(temp_index);
+        temp_index += 1;
+    }
+
+    let pattern2DArray = Object.values(patternObj);
+    pattern2DArray.sort();
+
+    let nums2DArray = Object.values(numObject);
+    nums2DArray.sort();
+
+    return JSON.stringify(pattern2DArray) === JSON.stringify(nums2DArray);
+  }, []);
+
   const downloadCSV = useCallback((csvContent) => {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `st${start}-----end${end}--sds${singleDigitSum}--dds${twoDigitSum}--nnn${numbersNotNeeded}.csv`);
+      link.setAttribute('download', `st${start}-----end${end}--sds${singleDigitSum}--dds${twoDigitSum}--nnn${numbersNotNeeded}--tdp${tenDigitPattern}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
-  }, [start, end, singleDigitSum, twoDigitSum, numbersNotNeeded]);
+  }, [start, end, singleDigitSum, twoDigitSum, numbersNotNeeded, tenDigitPattern]);
 
   const generateNumbers = useCallback((forDownload = false) => {
     setError('');
-    if (!forDownload) {
-      setGeneratedNumbers([]);
-    }
+    setGeneratedNumbers([]);
     setIsGenerating(true);
+    setProgress(0);
+    cancelRef.current = false;
 
     if (!start || !end) {
       setError('Start and End values are required.');
@@ -64,10 +99,15 @@ const NumberGenerator = () => {
     const allPossibleNumbers = Math.pow(10, remainingDigits) - 1;
 
     let i = 0;
-    const batchSize = 10000; // Increased batch size for CSV generation
-    let csvContent = forDownload ? `st${start}-----end${end}--sds${singleDigitSum}--dds${twoDigitSum}--nnn${numbersNotNeeded}\n` : '';
+    const batchSize = 10000;
+    let csvContent = forDownload ? `st${start}-----end${end}--sds${singleDigitSum}--dds${twoDigitSum}--nnn${numbersNotNeeded}--tdp${tenDigitPattern}\n` : '';
 
     function processBatch() {
+      if (cancelRef.current) {
+        setIsGenerating(false);
+        return;
+      }
+
       const batchEnd = Math.min(i + batchSize, allPossibleNumbers);
       const newValidNumbers = [];
 
@@ -78,7 +118,8 @@ const NumberGenerator = () => {
         if (
           (!numbersNotNeeded || !containsDigits(numberStr, numbersNotNeeded)) &&
           (!singleDigitSum || digitRoot(numberStr) === parseInt(singleDigitSum)) &&
-          (!twoDigitSum || doubleDigitSumFunction(numberStr) === parseInt(twoDigitSum))
+          (!twoDigitSum || doubleDigitSumFunction(numberStr) === parseInt(twoDigitSum)) &&
+          (!tenDigitPattern || matches(numberStr, tenDigitPattern))
         ) {
           if (forDownload) {
             csvContent += `${numberStr}\n`;
@@ -92,6 +133,9 @@ const NumberGenerator = () => {
         setGeneratedNumbers(prev => [...prev, ...newValidNumbers]);
       }
 
+      const progress = Math.min(100, Math.round((i / allPossibleNumbers) * 100));
+      setProgress(progress);
+
       if (i <= allPossibleNumbers) {
         setTimeout(processBatch, 0);
       } else {
@@ -103,7 +147,11 @@ const NumberGenerator = () => {
     }
 
     processBatch();
-  }, [start, end, numbersNotNeeded, singleDigitSum, twoDigitSum, containsDigits, digitRoot, doubleDigitSumFunction, downloadCSV]);
+  }, [start, end, numbersNotNeeded, singleDigitSum, twoDigitSum, tenDigitPattern, containsDigits, digitRoot, doubleDigitSumFunction, matches, downloadCSV]);
+
+  const cancelGeneration = () => {
+    cancelRef.current = true;
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -145,6 +193,13 @@ const NumberGenerator = () => {
             onChange={(e) => setTwoDigitSum(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
+          <input
+            type="text"
+            placeholder="10 Digit Pattern"
+            value={tenDigitPattern}
+            onChange={(e) => setTenDigitPattern(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
         </div>
         <div className="mt-4 flex justify-center space-x-4">
           <button 
@@ -161,6 +216,14 @@ const NumberGenerator = () => {
           >
             {isGenerating ? 'Generating CSV...' : 'Download CSV'}
           </button>
+          {isGenerating && (
+            <button 
+              onClick={cancelGeneration}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cancel
+            </button>
+          )}
         </div>
       </div>
 
@@ -170,36 +233,49 @@ const NumberGenerator = () => {
         </div>
       )}
 
-      {(generatedNumbers.length > 0 || isGenerating) && (
+      {isGenerating && (
+        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <h3 className="text-xl font-bold mb-2">Generating Numbers...</h3>
+          <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${progress}%`}}></div>
+          </div>
+          <p className="mt-2">Progress: {progress}%</p>
+          <p className="mb-2">Numbers found so far: {generatedNumbers.length}</p>
+        </div>
+      )}
+
+      {!isGenerating && (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <h3 className="text-xl font-bold mb-2">Generated Numbers</h3>
-          {isGenerating ? (
-            <p className="mb-2">Generating numbers... {generatedNumbers.length} found so far.</p>
+          {generatedNumbers.length === 0 ? (
+            <p className="mb-2">No results found.</p>
           ) : (
-            <p className="mb-2">Total numbers generated: {generatedNumbers.length}</p>
+            <>
+              <p className="mb-2">Total numbers generated: {generatedNumbers.length}</p>
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="py-2 px-4 border-b text-left">No.</th>
+                      <th className="py-2 px-4 border-b text-left">Number</th>
+                      <th className="py-2 px-4 border-b text-left">Single Digit Sum</th>
+                      <th className="py-2 px-4 border-b text-left">Two Digit Sum</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {generatedNumbers.map((number, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                        <td className="py-2 px-4 border-b">{index + 1}</td>
+                        <td className="py-2 px-4 border-b">{number}</td>
+                        <td className="py-2 px-4 border-b">{digitRoot(number)}</td>
+                        <td className="py-2 px-4 border-b">{doubleDigitSumFunction(number)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-2 px-4 border-b text-left">No.</th>
-                  <th className="py-2 px-4 border-b text-left">Number</th>
-                  <th className="py-2 px-4 border-b text-left">Single Digit Sum</th>
-                  <th className="py-2 px-4 border-b text-left">Two Digit Sum</th>
-                </tr>
-              </thead>
-              <tbody>
-                {generatedNumbers.map((number, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                    <td className="py-2 px-4 border-b">{index + 1}</td>
-                    <td className="py-2 px-4 border-b">{number}</td>
-                    <td className="py-2 px-4 border-b">{digitRoot(number)}</td>
-                    <td className="py-2 px-4 border-b">{doubleDigitSumFunction(number)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       )}
     </div>
