@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 
 const NumberGenerator = () => {
   const [start, setStart] = useState('');
@@ -11,7 +11,22 @@ const NumberGenerator = () => {
   const [error, setError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isFormValid, setIsFormValid] = useState(true);
   const cancelRef = useRef(false);
+
+  useEffect(() => {
+    validateForm();
+  }, [tenDigitPattern]);
+
+  const validateForm = () => {
+    if (tenDigitPattern && tenDigitPattern.length !== 10) {
+      setError('10 Digit Pattern must be exactly 10 characters long or empty.');
+      setIsFormValid(false);
+    } else {
+      setError('');
+      setIsFormValid(true);
+    }
+  };
 
   const containsDigits = useCallback((numberStr, digitsPattern) => {
     const regex = new RegExp(`[${digitsPattern}]`);
@@ -83,24 +98,15 @@ const NumberGenerator = () => {
     setProgress(0);
     cancelRef.current = false;
 
-    if (!start || !end) {
-      setError('Start and End values are required.');
-      setIsGenerating(false);
-      return;
-    }
+    const startValue = start || '';
+    const endValue = end || '';
 
-    if (start.length + end.length > 10) {
-      setError('Start and end combined should not exceed 10 digits');
-      setIsGenerating(false);
-      return;
-    }
-
-    const remainingDigits = 10 - (start.length + end.length);
+    const remainingDigits = 10 - (startValue.length + endValue.length);
     const allPossibleNumbers = Math.pow(10, remainingDigits) - 1;
 
     let i = 0;
     const batchSize = 10000;
-    let csvContent = forDownload ? `st${start}-----end${end}--sds${singleDigitSum}--dds${twoDigitSum}--nnn${numbersNotNeeded}--tdp${tenDigitPattern}\n` : '';
+    let csvContent = forDownload ? `st${startValue}-----end${endValue}--sds${singleDigitSum}--dds${twoDigitSum}--nnn${numbersNotNeeded}--tdp${tenDigitPattern}\n` : '';
 
     function processBatch() {
       if (cancelRef.current) {
@@ -113,7 +119,7 @@ const NumberGenerator = () => {
 
       for (; i <= batchEnd; i++) {
         const middle = i.toString().padStart(remainingDigits, '0');
-        const numberStr = start + middle + end;
+        const numberStr = startValue + middle + endValue;
 
         if (
           (!numbersNotNeeded || !containsDigits(numberStr, numbersNotNeeded)) &&
@@ -160,14 +166,14 @@ const NumberGenerator = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <input
             type="text"
-            placeholder="Start"
+            placeholder="Start (optional)"
             value={start}
             onChange={(e) => setStart(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
           <input
             type="text"
-            placeholder="End"
+            placeholder="End (optional)"
             value={end}
             onChange={(e) => setEnd(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -197,21 +203,24 @@ const NumberGenerator = () => {
             type="text"
             placeholder="10 Digit Pattern"
             value={tenDigitPattern}
-            onChange={(e) => setTenDigitPattern(e.target.value)}
+            onChange={(e) => {
+              setTenDigitPattern(e.target.value);
+              validateForm();
+            }}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div className="mt-4 flex justify-center space-x-4">
           <button 
             onClick={() => generateNumbers(false)}
-            disabled={isGenerating}
+            disabled={isGenerating || !isFormValid}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
           >
             {isGenerating ? 'Generating...' : 'Generate Numbers'}
           </button>
           <button 
             onClick={() => generateNumbers(true)}
-            disabled={isGenerating}
+            disabled={isGenerating || !isFormValid}
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
           >
             {isGenerating ? 'Generating CSV...' : 'Download CSV'}
