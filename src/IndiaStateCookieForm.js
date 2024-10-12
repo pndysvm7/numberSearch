@@ -5,34 +5,38 @@ const BE_URL = "http://my-number-adarsh.eba-mhg6sxjw.us-east-1.elasticbeanstalk.
 // const BE_URL = "http://localhost:8000"
 
 const indianStates = [
-  { name: 'Andhra Pradesh', value: 'AP' },
-  { name: 'Arunachal Pradesh', value: 'AR' },
-  { name: 'Assam', value: 'AS' },
-  { name: 'Bihar', value: 'BR' },
-  { name: 'Chhattisgarh', value: 'CG' },
-  { name: 'Goa', value: 'GA' },
-  { name: 'Gujarat', value: 'GJ' },
-  { name: 'Haryana', value: 'HR' },
-  { name: 'Himachal Pradesh', value: 'HP' },
-  { name: 'Jharkhand', value: 'JH' },
-  { name: 'Karnataka', value: 'KA' },
-  { name: 'Kerala', value: 'KL' },
-  { name: 'Madhya Pradesh', value: 'MP' },
-  { name: 'Maharashtra', value: 'MH' },
-  { name: 'Manipur', value: 'MN' },
-  { name: 'Meghalaya', value: 'ML' },
-  { name: 'Mizoram', value: 'MZ' },
-  { name: 'Nagaland', value: 'NL' },
-  { name: 'Odisha', value: 'OD' },
-  { name: 'Punjab', value: 'PB' },
+  { name: 'Andhra Pradesh', value: 'Vijayawada' },
+  { name: 'Arunachal Pradesh', value: 'Itanagar' },
+  { name: 'Assam', value: 'Guwahati' },
+  { name: 'Bihar', value: 'Patna' },
+  { name: 'Chhattisgarh', value: 'Raipur' },
+  { name: 'Goa', value: 'Goa' },
+  { name: 'Gujarat', value: 'Rajkot' },
+  { name: 'Haryana', value: 'Rewari' },
+  { name: 'Himachal Pradesh', value: 'Shimla' },
+  { name: 'Jharkhand', value: 'Khunti' },
+  { name: 'Karnataka', value: 'Bangalore East' },
+  { name: 'Kerala', value: 'Trivandrum North' },
+  { name: 'Madhya Pradesh', value: 'Huzur' },
+  { name: 'Maharashtra', value: 'Pune Moffusil' },
+  { name: 'Mumbai', value: 'Mumbai' },
+  { name: 'Manipur', value: 'Imphal' },
+  { name: 'Meghalaya', value: 'shillong' },
+  { name: 'Mizoram', value: 'Aizawl' },
+  { name: 'Nagaland', value: 'Kohima' },
+  { name: 'Odisha', value: 'Bhubaneswar' },
+  { name: 'Punjab', value: 'Ludhiana' },
   { name: 'Rajasthan(302001)', value: 'Jaipur City' },
-  { name: 'Sikkim', value: 'SK' },
-  { name: 'Tamil Nadu', value: 'TN' },
-  { name: 'Telangana', value: 'TG' },
-  { name: 'Tripura', value: 'TR' },
-  { name: 'Uttar Pradesh', value: 'Allahabad' },
-  { name: 'Uttarakhand', value: 'UK' },
-  { name: 'West Bengal', value: 'WB' },
+  { name: 'Sikkim', value: 'Sikkim' },
+  { name: 'Tamil Nadu', value: 'Chennai' },
+  { name: 'Telangana', value: 'Suryapet' },
+  { name: 'Tripura', value: 'Agartala' },
+  { name: 'UP East(211001)', value: 'Allahabad' },
+  { name: 'UP West(243005)', value: 'Bareilly' },
+  { name: 'Delhi East', value: 'Delhi East' },
+  { name: 'Uttarakhand', value: 'Dehradun' },
+  { name: 'West Bengal', value: 'Darjeeling' },
+  { name: 'Kolkata', value: 'Calcutta' }
 ];
 
 const IndiaStateCookieForm = () => {
@@ -60,7 +64,7 @@ const IndiaStateCookieForm = () => {
     setErroredResponses([]);
 
     try {
-      const res = await fetch(`${BE_URL}/api/process`, {
+      const res = await fetch(`/api/process`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -120,7 +124,7 @@ const IndiaStateCookieForm = () => {
     setErroredResponses([]);
 
     try {
-      const res = await fetch(`${BE_URL}/api/test-cookie`, {
+      const res = await fetch(`/api/test-cookie`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
