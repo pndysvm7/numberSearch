@@ -1,7 +1,7 @@
 {
   "name": "number-generator",
   "version": "0.1.0",
-  "homepage": "https://pndysvm7.github.io/numberSearch",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "@headlessui/react": "^2.1.9",
