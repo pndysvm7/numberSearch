@@ -36,6 +36,7 @@ const IndiaStateCookieForm = () => {
   const [selectedState, setSelectedState] = useState('');
   const [cookie, setCookie] = useState('');
   const [digits, setDigits] = useState('');
+  const [googleSheetId, setGoogleSheetId] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
@@ -61,7 +62,8 @@ const IndiaStateCookieForm = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           cityname: selectedState, 
-          cookie 
+          cookie,
+          googleSheetId 
         }),
       });
 
@@ -236,9 +238,17 @@ const IndiaStateCookieForm = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
           />
 
+          <input
+            type="text"
+            placeholder="Enter Google Sheet ID"
+            value={googleSheetId}
+            onChange={(e) => setGoogleSheetId(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md"
+          />
+
           <button
             onClick={handleProcess}
-            disabled={isProcessing || !selectedState || !cookie}
+            disabled={isProcessing || !selectedState || !cookie || !googleSheetId}
             className="w-full bg-blue-500 text-white px-4 py-2 rounded-md disabled:bg-gray-300"
           >
             {isProcessing ? (

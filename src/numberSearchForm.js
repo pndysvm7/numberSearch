@@ -65,7 +65,7 @@ const NumberSearchForm = () => {
     setProgress(0);
 
     try {
-      const response = await fetch('https://9f9f-2401-4900-1c8e-63a2-c33-c4ae-14af-fcc6.ngrok-free.app/api/search-numbers', {
+      const response = await fetch('/api/search-numbers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
